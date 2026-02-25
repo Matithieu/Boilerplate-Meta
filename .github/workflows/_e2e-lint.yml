@@ -1,0 +1,30 @@
+name: E2E Lint
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install dependencies
+        working-directory: apps/e2e
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint E2E tests
+        working-directory: apps/e2e
+        run: pnpm run lint

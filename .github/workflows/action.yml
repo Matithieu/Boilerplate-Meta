@@ -1,0 +1,95 @@
+name: Build Boilerplate-Meta
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+# Cancel old runs on new pushes to same PR/branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    outputs:
+      api: ${{ steps.changes.outputs.api }}
+      web: ${{ steps.changes.outputs.web }}
+      e2e: ${{ steps.changes.outputs.e2e }}
+      any-app: ${{ steps.changes.outputs.api == 'true' || steps.changes.outputs.web == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: changes
+        uses: tj-actions/changed-files@v44
+        with:
+          files_yaml: |
+            api:
+              - 'apps/api/**'
+              - '.github/workflows/**'
+            web:
+              - 'apps/web/**'
+              - 'package.json'
+              - 'pnpm-workspace.yaml'
+              - 'turbo.json'
+              - '.github/workflows/**'
+            e2e:
+              - 'apps/e2e/**'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/**'
+
+      - name: Show changed apps
+        run: |
+          echo "API changed: ${{ steps.changes.outputs.api }}"
+          echo "Web changed: ${{ steps.changes.outputs.web }}"
+          echo "E2E changed: ${{ steps.changes.outputs.e2e }}"
+
+  api:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.api == 'true'
+    uses: ./.github/workflows/_api.yml
+    secrets: inherit
+
+  web:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.web == 'true'
+    uses: ./.github/workflows/_web.yml
+    secrets: inherit
+
+  e2e-lint:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.e2e == 'true'
+    uses: ./.github/workflows/_e2e-lint.yml
+
+  e2e-tests:
+    needs: [detect-changes, api, web]
+    if: |
+      always() &&
+      (needs.detect-changes.outputs.api == 'true' || needs.detect-changes.outputs.web == 'true') &&
+      (needs.api.result == 'success' || needs.api.result == 'skipped') &&
+      (needs.web.result == 'success' || needs.web.result == 'skipped')
+    uses: ./.github/workflows/_e2e-tests.yml
+    with:
+      api-changed: ${{ needs.detect-changes.outputs.api }}
+      web-changed: ${{ needs.detect-changes.outputs.web }}
+    secrets: inherit
+
+  push-images:
+    needs: [detect-changes, e2e-tests]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.any-app == 'true' &&
+      (needs.e2e-tests.result == 'success' || needs.e2e-tests.result == 'skipped')
+    uses: ./.github/workflows/_push-images.yml
+    with:
+      api-changed: ${{ needs.detect-changes.outputs.api }}
+      web-changed: ${{ needs.detect-changes.outputs.web }}
+    secrets: inherit

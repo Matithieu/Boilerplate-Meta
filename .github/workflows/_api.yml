@@ -1,0 +1,83 @@
+name: API Pipeline
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "24"
+          cache: gradle
+
+      - name: Build with Gradle
+        working-directory: apps/api
+        run: ./gradlew clean build --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-build
+          path: apps/api/build/libs/*.jar
+          retention-days: 1
+
+  test:
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "24"
+          cache: gradle
+
+      - name: Run API tests
+        working-directory: apps/api
+        run: ./gradlew test --no-daemon
+
+  docker-build:
+    needs: test
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup env
+        run: echo "${{ secrets.SECRET }}" > .env
+
+      - name: Load API image name
+        run: |
+          API_IMAGE=$(grep '^API_IMAGE=' .env | cut -d'=' -f2-)
+          echo "API_IMAGE=${API_IMAGE}" >> $GITHUB_ENV
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build API Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/api
+          push: false
+          tags: ${{ env.API_IMAGE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Save and upload image
+        run: docker save ${{ env.API_IMAGE }} | gzip > api-image.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-docker-image
+          path: api-image.tar.gz
+          retention-days: 1

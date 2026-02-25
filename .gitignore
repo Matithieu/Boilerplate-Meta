@@ -1,0 +1,61 @@
+# Environment
+.env
+.env.*
+!.env.example
+template.env.local
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node / pnpm
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# Turborepo
+.turbo/
+
+# Java / Gradle
+apps/api/.gradle/
+apps/api/build/
+apps/api/out/
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+logs/
+
+# Playwright / E2E
+apps/e2e/test-results/
+apps/e2e/playwright-report/
+apps/e2e/blob-report/
+
+# Docker / Certs
+config/certs/*
+config/traefik/prod/acme.json
+certbot/
+
+# Database
+*.sql
+backups/
+
+# Misc
+.venv/
+*.tmp

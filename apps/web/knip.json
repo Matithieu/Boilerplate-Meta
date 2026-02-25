@@ -1,0 +1,9 @@
+{
+  "entry": ["tsconfig.json", "tsconfig.build.json", "scripts/**"],
+  "project": ["src/**", "scripts/**"],
+  "ignoreDependencies": [
+    "@openapitools/openapi-generator-cli",
+    "@tanstack/eslint-plugin-query",
+    "typescript-eslint"
+  ]
+}

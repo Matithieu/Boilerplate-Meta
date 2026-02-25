@@ -1,0 +1,95 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+java {
+    sourceCompatibility = '24'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Spring AI
+    implementation platform("org.springframework.ai:spring-ai-bom:1.1.2")
+    implementation 'org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc'
+    implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+
+    // Stats
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // Jwt
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+    // Keycloak
+    implementation 'org.keycloak:keycloak-core:25.0.6'
+    implementation 'org.keycloak:keycloak-policy-enforcer:25.0.6'
+    implementation 'org.keycloak:keycloak-admin-client:25.0.6'
+
+    // resilience4j
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+
+    // Stripe
+    implementation 'com.stripe:stripe-java:25.13.0'
+
+    // GSON
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+    // Hibernate JSONB
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.11'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+
+    // Caffeine
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.4'
+
+    // Liquibase
+    implementation 'org.liquibase:liquibase-core'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    // Utils
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    // Test
+    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testCompileOnly 'org.projectlombok:lombok:1.18.38'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
+}
+
+// When running `./gradle bootRun`, load environment variables from .env file
+bootRun {
+    def envFile = file('.env')
+    if (envFile.exists()) {
+        envFile.eachLine { line ->
+            if (line && !line.startsWith('#') && line.contains('=')) {
+                def idx = line.indexOf('=')
+                def key = line.substring(0, idx).trim()
+                def value = line.substring(idx + 1).trim()
+                environment key, value
+            }
+        }
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

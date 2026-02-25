@@ -1,0 +1,118 @@
+http:
+  routers:
+    frontend-route:
+      rule: "PathPrefix(`/`)"
+      service: frontend-service
+      middlewares:
+        - redirect-to-frontend
+      tls: {} # Enable HTTPS for this route
+
+    backend-api-route:
+      rule: "Host(`localhost`) && PathPrefix(`/api/`)"
+      service: backend-service
+      middlewares:
+        - oauth-auth-redirect # redirects all unauthenticated to oauth2 signin
+        - rate-limit
+        - backend-prefix
+      tls: {}
+
+    keycloak-auth-route:
+      rule: "Host(`localhost`) && PathPrefix(`/auth`)"
+      service: keycloak-service
+      tls: {}
+
+    grafana-route:
+      rule: "Host(`localhost`) && PathPrefix(`/grafana`)"
+      service: grafana
+      tls: {}
+
+    pgadmin4-route:
+      rule: "Host(`localhost`) && PathPrefix(`/pgadmin4`)"
+      service: pgadmin4
+      tls: {}
+
+    services-oauth2-route:
+      rule: "Host(`localhost`) && PathPrefix(`/oauth2/`)"
+      service: oauth-backend
+      middlewares:
+        - auth-headers
+      tls: {}
+
+  services:
+    frontend-service:
+      loadBalancer:
+        servers:
+          - url: https://localhost:5173
+    backend-service:
+      loadBalancer:
+        servers:
+          - url: http://backend:8083
+    keycloak-service:
+      loadBalancer:
+        servers:
+          - url: http://keycloak:8080
+    grafana:
+      loadBalancer:
+        servers:
+          - url: http://grafana:3000
+    pgadmin4:
+      loadBalancer:
+        servers:
+          - url: http://pgadmin4:80
+    oauth-backend:
+      loadBalancer:
+        servers:
+          - url: http://oauth2-proxy:4180
+
+  middlewares:
+    auth-headers:
+      headers:
+        stsSeconds: 315360000 # 10 years
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        frameDeny: true
+    oauth-auth:
+      forwardAuth:
+        address: https://localhost/oauth2/auth
+        trustForwardHeader: true
+    oauth-errors:
+      errors:
+        status:
+          - "401"
+        service: oauth-backend
+        query: "/oauth2/sign_in?rd={url}"
+    redirect-to-frontend:
+      redirectRegex:
+        regex: "https://localhost/(.*)$"
+        replacement: "https://localhost:5173/${1}"
+        permanent: true
+    rate-limit:
+      rateLimit:
+        average: 5
+        burst: 10
+    backend-prefix:
+      replacePathRegex:
+        regex: "^/api/(.*)"
+        replacement: "/$1"
+
+    gzip:
+      compress: {}
+
+    oauth-auth-redirect:
+      forwardAuth:
+        address: http://oauth2-proxy:4180/
+        trustForwardHeader: true
+        authResponseHeaders:
+          - Authorization
+          - X-Auth-Request-Access-Token
+          - X-Auth-Request-User
+          - X-Auth-Request-Email
+          - Set-Cookie
+          - X-Auth-User
+          - X-Auth-Email
+          - X-Secret
+          - X-Forwarded-User
+          - X-WebAuth-User

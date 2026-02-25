@@ -1,0 +1,6 @@
+resolve:
+  http:
+    headers:
+      - matches: http://localhost:8083/v3/api-docs
+        name: X-Auth-Request-Access-Token
+        envVariable: AUTH_TOKEN

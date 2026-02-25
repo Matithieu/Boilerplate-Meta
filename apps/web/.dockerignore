@@ -1,0 +1,21 @@
+# Logs
+logs
+*.log
+
+# Node modules
+node_modules
+
+# Build directory
+dist
+
+# Environment files
+*.env.local
+
+# Editor directories and files
+.vscode
+.idea
+.DS_Store
+
+# Git files
+.git
+.gitignore

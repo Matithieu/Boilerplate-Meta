@@ -1,0 +1,81 @@
+name: E2E Tests
+
+on:
+  workflow_call:
+    inputs:
+      api-changed:
+        type: string
+        required: true
+      web-changed:
+        type: string
+        required: true
+
+jobs:
+  run:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    env:
+      NEXUS_DOCKER_URL: ${{ secrets.NEXUS_DOCKER_URL }}
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup env
+        run: echo "${{ secrets.SECRET }}" > .env
+
+      - name: Download API Docker image
+        if: inputs.api-changed == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: api-docker-image
+
+      - name: Download Web Docker image
+        if: inputs.web-changed == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: web-docker-image
+
+      - name: Load Docker images
+        run: |
+          if [ -f api-image.tar.gz ]; then docker load < api-image.tar.gz; fi
+          if [ -f web-image.tar.gz ]; then docker load < web-image.tar.gz; fi
+
+      - name: Log in to Nexus Docker registry
+        run: echo "${NEXUS_PASSWORD}" | docker login "${NEXUS_DOCKER_URL}" -u "${NEXUS_USERNAME}" --password-stdin
+
+      - name: Start production environment
+        run: ./devcli start prod
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for services to start..."
+          sleep 30
+
+      - name: Run E2E tests
+        run: ./devcli e2e_tests
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/e2e/test-results/
+          retention-days: 2
+
+      - name: Collect Docker logs
+        if: always()
+        run: ./devcli logs prod
+
+      - name: Upload Docker logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-logs
+          path: logs/
+          retention-days: 2
+
+      - name: Stop production environment
+        if: always()
+        run: ./devcli stop prod --force

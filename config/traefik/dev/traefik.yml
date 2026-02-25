@@ -1,0 +1,38 @@
+entryPoints:
+  web:
+    address: ':80'
+    http:
+      redirections:
+        entryPoint:
+          to: 'websecure'
+          scheme: https
+          permanent: true
+  websecure:
+    address: ':443'
+
+api:
+  insecure: true
+  dashboard: false
+  debug: true
+
+serversTransport:
+  insecureSkipVerify: true
+
+log:
+  level: DEBUG
+
+providers:
+  file:
+    filename: /etc/traefik/conf.d/traefik_dynamic.yml
+
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/server.crt
+        keyFile: /certs/server.key
+  certificates:
+    - certFile: /certs/server.crt
+      keyFile: /certs/server.key
+      stores:
+        - default

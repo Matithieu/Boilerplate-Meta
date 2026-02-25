@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: v2-remove-quota
+      author: boilerplate
+      changes:
+        - dropTable:
+            tableName: user_quota
+
+        - dropTable:
+            tableName: app_settings

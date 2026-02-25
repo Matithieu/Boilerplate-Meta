@@ -1,0 +1,49 @@
+package com.example.spring.app.llm.userConversation;
+
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+import static com.example.spring.app.llm.LLMUtils.parseConversationTitle;
+
+@Service
+public class UserConversationService {
+
+    private final UserConversationRepository userConversationRepository;
+
+    public UserConversationService(UserConversationRepository userConversationRepository) {
+        this.userConversationRepository = userConversationRepository;
+    }
+
+    public UserConversationModel getUserConversation(String conversationId, String userId) {
+        return userConversationRepository.findByConversationIdAndUserId(conversationId, userId);
+    }
+
+    public UserConversationModel createNewConversationForUser(String userId, String conversationTitle) {
+        UserConversationModel newConversation = new UserConversationModel();
+
+        String parsedTitle = parseConversationTitle(conversationTitle);
+        newConversation.setTitle(parsedTitle);
+
+        String conversationId = UUID.randomUUID().toString();
+
+        newConversation.setUserId(userId);
+        newConversation.setConversationId(conversationId);
+        return userConversationRepository.save(newConversation);
+    }
+
+    public List<UserConversationModel> getAllConversationsForUser(String userId) {
+        return userConversationRepository.findAllByUserId(userId);
+    }
+
+    public void deleteUserConversation(String conversationId, String userId) {
+        UserConversationModel conversation = getUserConversation(conversationId, userId);
+        if (conversation != null) {
+            userConversationRepository.delete(conversation);
+            return;
+        }
+
+        throw new RuntimeException("Conversation not found for user. Mismatched user or conversation ID.");
+    }
+}
