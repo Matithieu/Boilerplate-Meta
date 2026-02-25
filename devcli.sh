@@ -352,7 +352,7 @@ reload() {
 
 # Start the E2E test environment
 run_end2end_tests() {
-    docker build -t e2e-tests ./apps/e2e/
+    docker build -f ./apps/e2e/Dockerfile -t e2e-tests .
     docker run \
             --rm \
             --ipc=host \
