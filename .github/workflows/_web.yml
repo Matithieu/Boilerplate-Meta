@@ -60,18 +60,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup env
-        run: echo "${{ secrets.SECRET }}" > .env
-
-      - name: Load Frontend image name
+      - name: Set image name
         run: |
-          FRONTEND_IMAGE=$(grep '^FRONTEND_IMAGE=' .env | cut -d'=' -f2-)
-          if [ -z "$FRONTEND_IMAGE" ]; then
-            echo "Error: FRONTEND_IMAGE is not set in .env (SECRET)"
-            exit 1
-          fi
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "FRONTEND_IMAGE=${FRONTEND_IMAGE}:${SHORT_SHA}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${SHORT_SHA}" >> $GITHUB_ENV
 
       - uses: docker/setup-buildx-action@v3
 

@@ -53,18 +53,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup env
-        run: echo "${{ secrets.SECRET }}" > .env
-
-      - name: Load API image name
+      - name: Set image name
         run: |
-          API_IMAGE=$(grep '^API_IMAGE=' .env | cut -d'=' -f2-)
-          if [ -z "$API_IMAGE" ]; then
-            echo "Error: API_IMAGE is not set in .env (SECRET)"
-            exit 1
-          fi
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "API_IMAGE=${API_IMAGE}:${SHORT_SHA}" >> $GITHUB_ENV
+          echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:${SHORT_SHA}" >> $GITHUB_ENV
 
       - uses: docker/setup-buildx-action@v3
 
