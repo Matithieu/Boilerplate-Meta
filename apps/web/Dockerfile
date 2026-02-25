@@ -27,6 +27,7 @@ WORKDIR /app
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY package.json pnpm-workspace.yaml ./
 
 # Copy web app source

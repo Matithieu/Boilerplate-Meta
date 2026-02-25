@@ -64,7 +64,7 @@ export default [
       '@typescript-eslint/consistent-type-assertions': 0,
       'no-void': 0,
 
-      '@typescript-eslint/padding-line-between-statements': [
+      'padding-line-between-statements': [
         2,
         {
           blankLine: 'always',
