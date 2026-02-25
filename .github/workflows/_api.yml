@@ -59,6 +59,10 @@ jobs:
       - name: Load API image name
         run: |
           API_IMAGE=$(grep '^API_IMAGE=' .env | cut -d'=' -f2-)
+          if [ -z "$API_IMAGE" ]; then
+            echo "Error: API_IMAGE is not set in .env (SECRET)"
+            exit 1
+          fi
           echo "API_IMAGE=${API_IMAGE}" >> $GITHUB_ENV
 
       - uses: docker/setup-buildx-action@v3

@@ -108,6 +108,10 @@ start() {
         BUILD_ARG=""
         if [ "$1" = "prod" ]; then
             echo -e "${YELLOW}Starting in production mode...${NC}"
+            if [ -z "$API_IMAGE" ] || [ -z "$FRONTEND_IMAGE" ]; then
+                echo -e "${RED}Error: API_IMAGE and FRONTEND_IMAGE must be set in .env for production mode.${NC}"
+                exit 1
+            fi
         else
             echo -e "${YELLOW}Starting in development mode...${NC}"
             BUILD_ARG="--build"

@@ -66,6 +66,10 @@ jobs:
       - name: Load Frontend image name
         run: |
           FRONTEND_IMAGE=$(grep '^FRONTEND_IMAGE=' .env | cut -d'=' -f2-)
+          if [ -z "$FRONTEND_IMAGE" ]; then
+            echo "Error: FRONTEND_IMAGE is not set in .env (SECRET)"
+            exit 1
+          fi
           echo "FRONTEND_IMAGE=${FRONTEND_IMAGE}" >> $GITHUB_ENV
 
       - uses: docker/setup-buildx-action@v3

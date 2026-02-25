@@ -30,6 +30,10 @@ jobs:
         run: |
           API_IMAGE=$(grep '^API_IMAGE=' .env | cut -d'=' -f2-)
           FRONTEND_IMAGE=$(grep '^FRONTEND_IMAGE=' .env | cut -d'=' -f2-)
+          if [ -z "$API_IMAGE" ] || [ -z "$FRONTEND_IMAGE" ]; then
+            echo "Error: API_IMAGE and FRONTEND_IMAGE must be set in .env (SECRET)"
+            exit 1
+          fi
           echo "API_IMAGE=${API_IMAGE}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${FRONTEND_IMAGE}" >> $GITHUB_ENV
 
