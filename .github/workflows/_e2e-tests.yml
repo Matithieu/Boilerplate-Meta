@@ -61,6 +61,8 @@ jobs:
 
       - name: Run E2E tests
         run: ./devcli e2e_tests
+        env:
+          BASE_URL: https://traefik
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}

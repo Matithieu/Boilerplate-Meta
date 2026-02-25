@@ -87,10 +87,10 @@ const config: PlaywrightTestConfig = {
           //   server: '127.0.0.1:8888',
           // },
         },
-        // contextOptions: {
-        //   /* settings to bypass certificate issues */
-        //   ignoreHTTPSErrors: true,
-        // },
+        contextOptions: {
+          /* settings to bypass certificate issues */
+          ignoreHTTPSErrors: true,
+        },
       },
     },
     //

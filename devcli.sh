@@ -368,8 +368,8 @@ run_end2end_tests() {
     if docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
         echo -e "${GREEN}Found network: $NETWORK_NAME${NC}"
         NETWORK_ARG="--network=$NETWORK_NAME"
-        # Use BASE_URL from environment or default to http://traefik
-        BASE_URL=${BASE_URL:-http://traefik}
+        # Use BASE_URL from environment or default to https://traefik (production uses HTTPS)
+        BASE_URL=${BASE_URL:-https://traefik}
     else
         echo -e "${YELLOW}Warning: Network $NETWORK_NAME not found, using host.docker.internal${NC}"
         NETWORK_ARG="--add-host=host.docker.internal:host-gateway"
