@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 type Theme = 'dark' | 'light' | 'system'
+const StorageKey = 'vite-ui-theme'
 
 type ThemeProviderProps = {
   children: React.ReactNode
@@ -13,17 +14,15 @@ type ThemeProviderState = {
   setTheme: (theme: Theme) => void
 }
 
-const initialState: ThemeProviderState = {
-  theme: 'system',
+const ThemeProviderContext = createContext<ThemeProviderState>({
   setTheme: () => null,
-}
+  theme: 'system',
+})
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
-
-export function ShadCNTheme({
+export function ThemeProvider({
   children,
   defaultTheme = 'light',
-  storageKey = 'vite-ui-theme',
+  storageKey = StorageKey,
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(

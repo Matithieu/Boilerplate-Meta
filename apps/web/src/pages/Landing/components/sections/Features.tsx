@@ -109,7 +109,8 @@ const useStyles = makeStyles()((theme) => ({
     marginBottom: '1rem',
     borderRadius: '9999px',
     padding: '0.5rem',
-    boxShadow: `0 0 0 8px`,
+    backgroundColor: theme.colors.primaryAlpha10,
+    boxShadow: `0 0 0 8px ${theme.colors.primaryAlpha10}`,
   },
   cardContent: {
     textAlign: 'center',

@@ -6,22 +6,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Moon, Sun } from 'lucide-react'
+import { FC } from 'react'
 
-import { useTheme } from './ThemeProvider'
+import { useTheme } from '../ThemeProvider'
 
-export function ShadCNModeToggle() {
-  const { setTheme } = useTheme()
+const ColorModeToggle: FC = () => {
+  const { theme, setTheme } = useTheme()
+
+  const isDark = theme === 'dark'
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Button>
-          <Sun style={{ width: '1.2rem', height: '1.2rem' }} />
-          <Moon
-            style={{ position: 'absolute', width: '1.2rem', height: '1.2rem' }}
-          />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
+        <Button>{isDark ? <Moon /> : <Sun />}</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme('light')}>
@@ -37,3 +34,5 @@ export function ShadCNModeToggle() {
     </DropdownMenu>
   )
 }
+
+export default ColorModeToggle

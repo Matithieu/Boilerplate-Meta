@@ -46,7 +46,7 @@ const useStyles = makeStyles()((theme) => ({
   },
   card: {
     borderRadius: theme.radius.lg,
-    border: '1px solid #e5e7eb',
+    border: `1px solid ${theme.colors.border}`,
     boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
   },
   iframe: {
