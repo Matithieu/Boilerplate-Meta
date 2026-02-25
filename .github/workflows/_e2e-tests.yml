@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup env
-        run: echo "${{ secrets.SECRET }}" > .env
+        run: cp template.env .env
 
       - name: Download API Docker image
         if: inputs.api-changed == 'true'
