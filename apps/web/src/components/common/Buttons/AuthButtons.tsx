@@ -9,11 +9,7 @@ export const LoginButton: FC = () => {
   const authUser = useAuthManager()
 
   return (
-    <Button
-      onClick={() => {
-        authUser.signIn()
-      }}
-    >
+    <Button onClick={() => authUser.signIn()}>
       {formatMessage(commonMessages.toLogin)}
     </Button>
   )
