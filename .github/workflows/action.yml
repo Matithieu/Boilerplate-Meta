@@ -84,6 +84,9 @@ jobs:
 
   push-images:
     needs: [detect-changes, e2e-tests]
+    permissions:
+      contents: read
+      packages: write
     if: |
       always() &&
       needs.detect-changes.outputs.any-app == 'true' &&
