@@ -354,20 +354,30 @@ reload() {
 run_end2end_tests() {
     docker build -f ./apps/e2e/Dockerfile -t e2e-tests .
     
-    # Detect the docker-compose network name
-    COMPOSE_PROJECT_NAME=$(basename "$(pwd)" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]//g')
-    NETWORK_NAME="${COMPOSE_PROJECT_NAME}_default"
+    # Try to detect the actual docker-compose network dynamically
+    # This works both locally and in CI by finding the network created by docker-compose
+    NETWORK_NAME=$(docker network ls --format '{{.Name}}' | grep '_default$' | head -n 1)
     
-    # Check if network exists, if not use host network as fallback
+    if [ -z "$NETWORK_NAME" ]; then
+        # Fallback: try to construct from directory name
+        COMPOSE_PROJECT_NAME=$(basename "$(pwd)" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]-')
+        NETWORK_NAME="${COMPOSE_PROJECT_NAME}_default"
+    fi
+    
+    # Verify the network exists
     if docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
+        echo -e "${GREEN}Found network: $NETWORK_NAME${NC}"
         NETWORK_ARG="--network=$NETWORK_NAME"
+        # Use BASE_URL from environment or default to http://traefik
+        BASE_URL=${BASE_URL:-http://traefik}
     else
         echo -e "${YELLOW}Warning: Network $NETWORK_NAME not found, using host.docker.internal${NC}"
         NETWORK_ARG="--add-host=host.docker.internal:host-gateway"
+        # When not on docker network, use host network addressing
+        BASE_URL=${BASE_URL:-http://host.docker.internal}
     fi
     
-    # Use BASE_URL from environment or default to http://traefik
-    BASE_URL=${BASE_URL:-http://traefik}
+    echo -e "${GREEN}Running E2E tests with BASE_URL=$BASE_URL${NC}"
     
     docker run \
             --rm \
