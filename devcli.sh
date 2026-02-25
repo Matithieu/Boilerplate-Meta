@@ -353,11 +353,29 @@ reload() {
 # Start the E2E test environment
 run_end2end_tests() {
     docker build -f ./apps/e2e/Dockerfile -t e2e-tests .
+    
+    # Detect the docker-compose network name
+    COMPOSE_PROJECT_NAME=$(basename "$(pwd)" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]//g')
+    NETWORK_NAME="${COMPOSE_PROJECT_NAME}_default"
+    
+    # Check if network exists, if not use host network as fallback
+    if docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
+        NETWORK_ARG="--network=$NETWORK_NAME"
+    else
+        echo -e "${YELLOW}Warning: Network $NETWORK_NAME not found, using host.docker.internal${NC}"
+        NETWORK_ARG="--add-host=host.docker.internal:host-gateway"
+    fi
+    
+    # Use BASE_URL from environment or default to http://traefik
+    BASE_URL=${BASE_URL:-http://traefik}
+    
     docker run \
             --rm \
             --ipc=host \
+            $NETWORK_ARG \
             --env PW_RUN_HEADLESS="1" \
             --env CI="1" \
+            --env BASE_URL="$BASE_URL" \
             e2e-tests
 }
 
