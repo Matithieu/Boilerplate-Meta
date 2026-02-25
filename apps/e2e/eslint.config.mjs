@@ -17,7 +17,7 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', 'test-results/**', 'playwright-report/**', 'blob-report/**'],
   },
   ...compat.extends('eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'),
   {
@@ -37,7 +37,7 @@ export default [
 
       parserOptions: {
         project: ['./tsconfig.json'],
-        tsconfigRootDir: './',
+        tsconfigRootDir: __dirname,
       },
     },
 

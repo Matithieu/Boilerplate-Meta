@@ -1,6 +1,8 @@
+import { Page } from '@playwright/test'
+
 import { Common } from '#/fixtures/common'
 import { test as base } from '#/fixtures/common'
-import { Page } from '@playwright/test'
+
 import { settingsRoute } from './settings.type'
 
 export class SettingsPage {

@@ -79,10 +79,10 @@ jobs:
           tags: ${{ env.FRONTEND_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
+          outputs: type=docker,dest=web-image.tar
 
-      - name: Save and upload image
-        run: docker save ${{ env.FRONTEND_IMAGE }} | gzip > web-image.tar.gz
+      - name: Compress image
+        run: gzip web-image.tar
 
       - uses: actions/upload-artifact@v4
         with:

@@ -1,6 +1,8 @@
-import { config } from '#/config/config.config'
-import { asserts } from '#/utils/assertion.util'
 import { Page } from '@playwright/test'
+
+import { asserts } from '#/utils/assertion.util'
+
+import { config } from '#/config/config.config'
 
 export async function login(page: Page, username: string, password: string) {
   // If we are running locally (on the front-end), we need to change it to the reverse proxy URL

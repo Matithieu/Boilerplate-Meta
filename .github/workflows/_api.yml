@@ -71,10 +71,10 @@ jobs:
           tags: ${{ env.API_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
+          outputs: type=docker,dest=api-image.tar
 
-      - name: Save and upload image
-        run: docker save ${{ env.API_IMAGE }} | gzip > api-image.tar.gz
+      - name: Compress image
+        run: gzip api-image.tar
 
       - uses: actions/upload-artifact@v4
         with:

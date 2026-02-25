@@ -1,8 +1,9 @@
-import { login } from './login.util'
 import { Page } from '@playwright/test'
 
-import { config } from '#/config/config.config'
 import { test as base } from '../global-hook'
+import { login } from './login.util'
+
+import { config } from '#/config/config.config'
 
 export const test = base.extend<Page>({
   page: async ({ page }, use) => {

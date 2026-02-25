@@ -1,7 +1,8 @@
 import { expect } from '@playwright/test'
 
-import { config } from '../../config/config.config'
 import { test } from '#/fixtures/settings'
+
+import { config } from '../../config/config.config'
 
 test.use({
   ignoreHTTPSErrors: true,
