@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "test": "playwright test",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css}\""
   },

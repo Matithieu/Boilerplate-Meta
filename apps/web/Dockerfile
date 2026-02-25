@@ -1,8 +1,8 @@
 # Stage 1: Install dependencies
 FROM node:18.20.4-alpine AS deps
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm (pinned to match packageManager field in package.json)
+RUN npm install -g pnpm@9
 
 WORKDIR /app
 
@@ -16,8 +16,8 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 # Stage 2: Build the application
 FROM node:18.20.4-alpine AS build-stage
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm (pinned to match packageManager field in package.json)
+RUN npm install -g pnpm@9
 
 WORKDIR /app
 
