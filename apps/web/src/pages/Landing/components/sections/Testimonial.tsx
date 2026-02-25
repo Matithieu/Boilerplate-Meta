@@ -122,7 +122,13 @@ const useStyles = makeStyles()((theme) => ({
     },
   },
   carouselItem: {
-    // basis handled inline via style prop for md/lg
+    flexBasis: '100%',
+    [theme.bp.md]: {
+      flexBasis: '50%',
+    },
+    [theme.bp.lg]: {
+      flexBasis: '33.333%',
+    },
   },
   card: {
     backgroundColor: theme.colors.mutedAlpha50,
@@ -175,7 +181,7 @@ export const TestimonialSection = () => {
       >
         <CarouselContent>
           {reviewList.map((review) => (
-            <CarouselItem key={review.name} style={{ flexBasis: '100%' }}>
+            <CarouselItem key={review.name} className={classes.carouselItem}>
               <Card className={classes.card}>
                 <CardContent style={{ paddingBottom: 0, paddingTop: '1.5rem' }}>
                   <div className={classes.starsRow}>

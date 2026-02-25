@@ -1,5 +1,6 @@
-import { config } from '#/config/config.config'
 import { Page, test as base } from '@playwright/test'
+
+import { config } from '#/config/config.config'
 
 class ErrorHandler {
   #errors: [string, string][] = []

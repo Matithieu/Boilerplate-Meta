@@ -1,6 +1,8 @@
-import { config } from '#/config/config.config'
-import { test as base } from '#/fixtures/login'
 import { Page } from '@playwright/test'
+
+import { test as base } from '#/fixtures/login'
+
+import { config } from '#/config/config.config'
 
 export class Common {
   #page: Page

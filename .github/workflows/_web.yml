@@ -11,15 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: pnpm
-
       - uses: pnpm/action-setup@v3
         with:
           version: 9
           run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
 
       - id: pnpm-cache
         shell: bash
@@ -60,28 +60,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup env
-        run: echo "${{ secrets.SECRET }}" > .env
-
-      - name: Load Frontend image name
+      - name: Set image name
         run: |
-          FRONTEND_IMAGE=$(grep '^FRONTEND_IMAGE=' .env | cut -d'=' -f2-)
-          echo "FRONTEND_IMAGE=${FRONTEND_IMAGE}" >> $GITHUB_ENV
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${SHORT_SHA}" >> $GITHUB_ENV
 
       - uses: docker/setup-buildx-action@v3
 
       - name: Build Web Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./apps/web
+          context: .
+          file: ./apps/web/Dockerfile
           push: false
           tags: ${{ env.FRONTEND_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
+          outputs: type=docker,dest=web-image.tar
 
-      - name: Save and upload image
-        run: docker save ${{ env.FRONTEND_IMAGE }} | gzip > web-image.tar.gz
+      - name: Compress image
+        run: gzip web-image.tar
 
       - uses: actions/upload-artifact@v4
         with:

@@ -3,7 +3,14 @@ import { makeStyles } from '@/theme/makeStyles'
 import { Menu as BaseMenu } from '@base-ui/react/menu'
 import * as React from 'react'
 
-const useStyles = makeStyles<{ inset?: boolean }>()((theme, { inset }) => ({
+const useStyles = makeStyles()((theme) => ({
+  trigger: {
+    background: 'none',
+    border: 'none',
+    padding: 0,
+    cursor: 'pointer',
+    display: 'inline-flex',
+  },
   content: {
     zIndex: 50,
     minWidth: '8rem',
@@ -25,34 +32,49 @@ const useStyles = makeStyles<{ inset?: boolean }>()((theme, { inset }) => ({
   item: {
     position: 'relative',
     display: 'flex',
-    cursor: 'default',
+    cursor: 'pointer',
     userSelect: 'none',
     alignItems: 'center',
     gap: '0.5rem',
-    borderRadius: '0.125rem',
-    paddingLeft: inset ? '2rem' : '0.5rem',
-    paddingRight: '0.5rem',
-    paddingTop: '0.375rem',
-    paddingBottom: '0.375rem',
+    borderRadius: theme.radius.sm,
+    padding: '0.375rem 0.5rem',
     fontSize: '0.875rem',
+    fontFamily: 'inherit',
     outline: 'none',
-    transition: 'background-color 0.15s ease, color 0.15s ease',
     border: 'none',
     background: 'none',
     width: '100%',
     color: theme.colors.foreground,
-    '&:focus': {
+    transition: `background-color ${theme.transitions.fast}, color ${theme.transitions.fast}`,
+    '&[data-highlighted]': {
       backgroundColor: theme.colors.accent,
       color: theme.colors.accentForeground,
     },
     '&[data-disabled]': { pointerEvents: 'none', opacity: 0.5 },
     '& > svg': { width: '1rem', height: '1rem', flexShrink: 0 },
   },
+  itemInset: {
+    paddingLeft: '2rem',
+  },
 }))
 
 const DropdownMenu = BaseMenu.Root
 
-const DropdownMenuTrigger = BaseMenu.Trigger
+const DropdownMenuTrigger = ({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof BaseMenu.Trigger>) => {
+  const { cx, classes } = useStyles()
+  return (
+    <BaseMenu.Trigger
+      className={cx(
+        classes.trigger,
+        typeof className === 'string' ? className : undefined,
+      )}
+      {...props}
+    />
+  )
+}
 
 interface DropdownMenuContentProps
   extends React.ComponentPropsWithoutRef<typeof BaseMenu.Positioner> {
@@ -65,7 +87,7 @@ const DropdownMenuContent = ({
   children,
   ...props
 }: DropdownMenuContentProps) => {
-  const { classes, cx } = useStyles({})
+  const { classes, cx } = useStyles()
   return (
     <BaseMenu.Portal>
       <BaseMenu.Positioner sideOffset={sideOffset} {...props}>
@@ -92,11 +114,12 @@ const DropdownMenuItem = ({
   inset,
   ...props
 }: DropdownMenuItemProps) => {
-  const { classes, cx } = useStyles({ inset })
+  const { classes, cx } = useStyles()
   return (
     <BaseMenu.Item
       className={cx(
         classes.item,
+        inset && classes.itemInset,
         typeof className === 'string' ? className : undefined,
       )}
       {...props}

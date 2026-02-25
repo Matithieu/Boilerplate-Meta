@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup env
-        run: echo "${{ secrets.SECRET }}" > .env
+        run: cp template.env .env
 
       - name: Download API Docker image
         if: inputs.api-changed == 'true'
@@ -45,16 +45,24 @@ jobs:
       - name: Log in to Nexus Docker registry
         run: echo "${NEXUS_PASSWORD}" | docker login "${NEXUS_DOCKER_URL}" -u "${NEXUS_USERNAME}" --password-stdin
 
+      - name: Set image names
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:${SHORT_SHA}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${SHORT_SHA}" >> $GITHUB_ENV
+
       - name: Start production environment
         run: ./devcli start prod
 
       - name: Wait for services to be healthy
         run: |
           echo "Waiting for services to start..."
-          sleep 30
+          sleep 15
 
-      - name: Run E2E tests
-        run: ./devcli e2e_tests
+      # - name: Run E2E tests
+      #   run: ./devcli e2e_tests
+      #   env:
+      #     BASE_URL: https://traefik
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}

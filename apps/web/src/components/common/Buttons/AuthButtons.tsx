@@ -9,11 +9,7 @@ export const LoginButton: FC = () => {
   const authUser = useAuthManager()
 
   return (
-    <Button
-      onClick={() => {
-        authUser.signIn()
-      }}
-    >
+    <Button onClick={() => authUser.signIn()}>
       {formatMessage(commonMessages.toLogin)}
     </Button>
   )
@@ -23,11 +19,7 @@ export const LogoutButton: FC = () => {
   const authUser = useAuthManager()
 
   return (
-    <Button
-      onClick={() => {
-        authUser.signOut()
-      }}
-    >
+    <Button onClick={() => authUser.signOut()}>
       {formatMessage(commonMessages.toLogout)}
     </Button>
   )

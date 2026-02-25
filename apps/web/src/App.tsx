@@ -10,7 +10,7 @@ import ConfigurationProvider from './containers/Configuration/ConfigurationProvi
 import LocaleProvider from './containers/LocaleProvider/LocaleProvider'
 import PostHogProvider from './containers/PostHog/PostHogProvider'
 import AppRouter from './containers/Router/RouterProvider'
-import { ShadCNTheme } from './containers/ShadCN/ThemeProvider'
+import { ThemeProvider } from './containers/Theme/ThemeProvider'
 import { injectAppGlobalStyles } from './theme/globalStyles'
 
 injectAppGlobalStyles()
@@ -34,7 +34,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ConfigurationProvider>
           <PostHogProvider>
-            <ShadCNTheme storageKey="web-theme">
+            <ThemeProvider>
               <LocaleProvider>
                 <HelmetProvider>
                   <Suspense fallback={<LoadingCircular />}>
@@ -42,7 +42,7 @@ function App() {
                   </Suspense>
                 </HelmetProvider>
               </LocaleProvider>
-            </ShadCNTheme>
+            </ThemeProvider>
           </PostHogProvider>
         </ConfigurationProvider>
       </QueryClientProvider>

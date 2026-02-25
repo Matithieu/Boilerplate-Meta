@@ -1,7 +1,6 @@
-import dotenv from 'dotenv'
-
 import type { PlaywrightTestConfig } from '@playwright/test'
 import { devices } from '@playwright/test'
+import dotenv from 'dotenv'
 
 /**
  * Read environment variables from file.
@@ -88,10 +87,10 @@ const config: PlaywrightTestConfig = {
           //   server: '127.0.0.1:8888',
           // },
         },
-        // contextOptions: {
-        //   /* settings to bypass certificate issues */
-        //   ignoreHTTPSErrors: true,
-        // },
+        contextOptions: {
+          /* settings to bypass certificate issues */
+          ignoreHTTPSErrors: true,
+        },
       },
     },
     //

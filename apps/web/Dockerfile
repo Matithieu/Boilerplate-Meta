@@ -1,41 +1,46 @@
 # Stage 1: Install dependencies
-FROM node:18.20.4-alpine AS deps
+FROM node:20-alpine AS deps
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm (pinned to match packageManager field in package.json)
+RUN npm install -g pnpm@9
 
 WORKDIR /app
 
-# Copy dependency files only
-COPY package.json pnpm-lock.yaml ./
+# Copy workspace root files (context = monorepo root)
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# Install dependencies with cache mount
+# Copy all workspace package.json files for dependency resolution
+COPY apps/web/package.json ./apps/web/
+COPY apps/e2e/package.json ./apps/e2e/
+
+# Install dependencies with cache mount (skip lifecycle scripts - source not present yet)
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile --prod=false
+    pnpm install --frozen-lockfile --ignore-scripts
 
 # Stage 2: Build the application
-FROM node:18.20.4-alpine AS build-stage
+FROM node:20-alpine AS build-stage
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm (pinned to match packageManager field in package.json)
+RUN npm install -g pnpm@9
 
 WORKDIR /app
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY package.json pnpm-lock.yaml ./
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY package.json pnpm-workspace.yaml ./
 
-# Copy source code
-COPY . .
+# Copy web app source
+COPY apps/web/ ./apps/web/
 
 ENV NODE_ENV=production
 
 # Build the application
-RUN pnpm run build
+RUN pnpm -C apps/web run build
 
-# Stage 2: Serve the application from Nginx
+# Stage 3: Serve the application from Nginx
 FROM nginx:1.26.2-alpine
 
 ARG CONFIG_PATH
 
-COPY --from=build-stage /app/dist /usr/share/nginx/html/
+COPY --from=build-stage /app/apps/web/dist /usr/share/nginx/html/

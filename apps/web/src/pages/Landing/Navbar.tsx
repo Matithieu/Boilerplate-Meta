@@ -2,14 +2,6 @@ import {
   LoginButton,
   LogoutButton,
 } from '@/components/common/Buttons/AuthButtons'
-import Button from '@/components/ui/button'
-// TODO: navigation-menu component needs to be created or replaced
-// import {
-//   NavigationMenu,
-//   NavigationMenuItem,
-//   NavigationMenuLink,
-//   NavigationMenuList,
-// } from '@/components/ui/navigation-menu'
 import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
@@ -20,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { ShadCNModeToggle } from '@/containers/ShadCN/mode-toggle'
+import ColorModeToggle from '@/containers/Theme/components/ColorModeToggle'
 import useToggle from '@/hooks/useToggle'
 import useUserStore from '@/stores/UserStore'
 import { makeStyles } from '@/theme/makeStyles'
@@ -35,7 +27,7 @@ interface RouteProps {
 const routeList: RouteProps[] = [
   {
     href: '/ui#testimonials',
-    label: 'Témoinages',
+    label: 'Testimonials',
   },
   {
     href: '/ui#pricing',
@@ -99,12 +91,20 @@ const useStyles = makeStyles()((theme) => ({
   sheetNavList: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '0.5rem',
+    gap: '0.25rem',
   },
   navLink: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    borderRadius: theme.radius.md,
+    padding: '0.5rem 0.75rem',
+    fontSize: '1rem',
     color: theme.colors.foreground,
     textDecoration: 'none',
+    transition: `background-color ${theme.transitions.fast}`,
     '&:hover': {
+      backgroundColor: theme.colors.accent,
       color: theme.colors.primary,
     },
   },
@@ -118,18 +118,36 @@ const useStyles = makeStyles()((theme) => ({
   desktopNav: {
     display: 'none',
     [theme.bp.lg]: {
-      display: 'block',
+      display: 'flex',
+      alignItems: 'center',
       marginLeft: 'auto',
       marginRight: 'auto',
+      '& ul': {
+        display: 'flex',
+        alignItems: 'center',
+        listStyle: 'none',
+        margin: 0,
+        padding: 0,
+        gap: '0.25rem',
+      },
+      '& li': {
+        display: 'flex',
+        alignItems: 'center',
+      },
     },
   },
   desktopNavLink: {
-    paddingLeft: '0.5rem',
-    paddingRight: '0.5rem',
+    paddingLeft: '0.75rem',
+    paddingRight: '0.75rem',
+    paddingTop: '0.375rem',
+    paddingBottom: '0.375rem',
+    borderRadius: theme.radius.md,
     fontSize: '1rem',
+    color: theme.colors.foreground,
     textDecoration: 'none',
+    transition: `background-color ${theme.transitions.fast}`,
     '&:hover': {
-      textDecoration: 'underline',
+      backgroundColor: theme.colors.accent,
     },
   },
   desktopActions: {
@@ -218,15 +236,14 @@ export const Navbar = () => {
 
               <div className={classes.sheetNavList}>
                 {routeList.map(({ href, label }) => (
-                  <Button
+                  <a
                     key={href}
-                    style={{ justifyContent: 'flex-start', fontSize: '1rem' }}
+                    className={classes.navLink}
+                    href={href}
                     onClick={() => setIsOpen(false)}
                   >
-                    <a className={classes.navLink} href={href}>
-                      {label}
-                    </a>
-                  </Button>
+                    {label}
+                  </a>
                 ))}
               </div>
             </div>
@@ -234,7 +251,7 @@ export const Navbar = () => {
             <SheetFooter className={classes.sheetFooter}>
               <Separator style={{ marginBottom: '0.5rem' }} />
 
-              <ShadCNModeToggle />
+              <ColorModeToggle />
               <ButtonToDisplay />
             </SheetFooter>
           </SheetContent>
@@ -255,7 +272,7 @@ export const Navbar = () => {
       </nav>
 
       <div className={classes.desktopActions}>
-        <ShadCNModeToggle />
+        <ColorModeToggle />
 
         <ButtonToDisplay />
       </div>

@@ -53,13 +53,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup env
-        run: echo "${{ secrets.SECRET }}" > .env
-
-      - name: Load API image name
+      - name: Set image name
         run: |
-          API_IMAGE=$(grep '^API_IMAGE=' .env | cut -d'=' -f2-)
-          echo "API_IMAGE=${API_IMAGE}" >> $GITHUB_ENV
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:${SHORT_SHA}" >> $GITHUB_ENV
 
       - uses: docker/setup-buildx-action@v3
 
@@ -71,10 +68,10 @@ jobs:
           tags: ${{ env.API_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
+          outputs: type=docker,dest=api-image.tar
 
-      - name: Save and upload image
-        run: docker save ${{ env.API_IMAGE }} | gzip > api-image.tar.gz
+      - name: Compress image
+        run: gzip api-image.tar
 
       - uses: actions/upload-artifact@v4
         with:

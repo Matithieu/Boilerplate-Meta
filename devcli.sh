@@ -108,6 +108,10 @@ start() {
         BUILD_ARG=""
         if [ "$1" = "prod" ]; then
             echo -e "${YELLOW}Starting in production mode...${NC}"
+            if [ -z "$API_IMAGE" ] || [ -z "$FRONTEND_IMAGE" ]; then
+                echo -e "${RED}Error: API_IMAGE and FRONTEND_IMAGE must be set in .env for production mode.${NC}"
+                exit 1
+            fi
         else
             echo -e "${YELLOW}Starting in development mode...${NC}"
             BUILD_ARG="--build"
@@ -348,12 +352,40 @@ reload() {
 
 # Start the E2E test environment
 run_end2end_tests() {
-    docker build -t e2e-tests ./apps/e2e/
+    docker build -f ./apps/e2e/Dockerfile -t e2e-tests .
+    
+    # Try to detect the actual docker-compose network dynamically
+    # This works both locally and in CI by finding the network created by docker-compose
+    NETWORK_NAME=$(docker network ls --format '{{.Name}}' | grep '_default$' | head -n 1)
+    
+    if [ -z "$NETWORK_NAME" ]; then
+        # Fallback: try to construct from directory name
+        COMPOSE_PROJECT_NAME=$(basename "$(pwd)" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]-')
+        NETWORK_NAME="${COMPOSE_PROJECT_NAME}_default"
+    fi
+    
+    # Verify the network exists
+    if docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
+        echo -e "${GREEN}Found network: $NETWORK_NAME${NC}"
+        NETWORK_ARG="--network=$NETWORK_NAME"
+        # Use BASE_URL from environment or default to https://traefik (production uses HTTPS)
+        BASE_URL=${BASE_URL:-https://traefik}
+    else
+        echo -e "${YELLOW}Warning: Network $NETWORK_NAME not found, using host.docker.internal${NC}"
+        NETWORK_ARG="--add-host=host.docker.internal:host-gateway"
+        # When not on docker network, use host network addressing
+        BASE_URL=${BASE_URL:-http://host.docker.internal}
+    fi
+    
+    echo -e "${GREEN}Running E2E tests with BASE_URL=$BASE_URL${NC}"
+    
     docker run \
             --rm \
             --ipc=host \
+            $NETWORK_ARG \
             --env PW_RUN_HEADLESS="1" \
             --env CI="1" \
+            --env BASE_URL="$BASE_URL" \
             e2e-tests
 }
 

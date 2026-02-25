@@ -108,7 +108,7 @@ const SubscriptionCard: FC<SubscriptionCardProps> = ({
 
         <div>
           <span className={classes.price}>${item.price}</span>
-          <span className={classes.priceUnit}> / jour</span>
+          <span className={classes.priceUnit}> / month</span>
         </div>
       </CardHeader>
 

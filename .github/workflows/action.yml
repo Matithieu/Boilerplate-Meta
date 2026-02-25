@@ -19,10 +19,10 @@ jobs:
     permissions:
       contents: read
     outputs:
-      api: ${{ steps.changes.outputs.api }}
-      web: ${{ steps.changes.outputs.web }}
-      e2e: ${{ steps.changes.outputs.e2e }}
-      any-app: ${{ steps.changes.outputs.api == 'true' || steps.changes.outputs.web == 'true' }}
+      api: ${{ steps.changes.outputs.api_any_changed }}
+      web: ${{ steps.changes.outputs.web_any_changed }}
+      e2e: ${{ steps.changes.outputs.e2e_any_changed }}
+      any-app: ${{ steps.changes.outputs.api_any_changed == 'true' || steps.changes.outputs.web_any_changed == 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,9 +48,9 @@ jobs:
 
       - name: Show changed apps
         run: |
-          echo "API changed: ${{ steps.changes.outputs.api }}"
-          echo "Web changed: ${{ steps.changes.outputs.web }}"
-          echo "E2E changed: ${{ steps.changes.outputs.e2e }}"
+          echo "API changed: ${{ steps.changes.outputs.api_any_changed }}"
+          echo "Web changed: ${{ steps.changes.outputs.web_any_changed }}"
+          echo "E2E changed: ${{ steps.changes.outputs.e2e_any_changed }}"
 
   api:
     needs: detect-changes
@@ -84,6 +84,9 @@ jobs:
 
   push-images:
     needs: [detect-changes, e2e-tests]
+    permissions:
+      contents: read
+      packages: write
     if: |
       always() &&
       needs.detect-changes.outputs.any-app == 'true' &&

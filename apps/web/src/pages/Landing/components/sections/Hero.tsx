@@ -38,10 +38,13 @@ const useStyles = makeStyles()((theme) => ({
     marginRight: 'auto',
     maxWidth: '768px',
     textAlign: 'center',
-    fontSize: '2.25rem',
-    fontWeight: 700,
-    [theme.bp.md]: {
-      fontSize: '3.75rem',
+    '& h1': {
+      margin: 0,
+      fontSize: '2.25rem',
+      fontWeight: 700,
+      [theme.bp.md]: {
+        fontSize: '3.75rem',
+      },
     },
   },
   gradientText: {

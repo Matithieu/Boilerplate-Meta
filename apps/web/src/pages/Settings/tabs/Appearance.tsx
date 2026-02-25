@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { ShadCNModeToggle } from '@/containers/ShadCN/mode-toggle'
+import ColorModeToggle from '@/containers/Theme/components/ColorModeToggle'
 import { FC } from 'react'
 
 import ChangeLanguageSelect from '../../../components/common/Select/ChangeLanguageSelect'
@@ -43,7 +43,7 @@ const AppearanceTab: FC = () => {
           {formatMessage(settingsMessages.appearance)}
         </h4>
         <div>
-          <ShadCNModeToggle />
+          <ColorModeToggle />
         </div>
       </Card>
     </div>
