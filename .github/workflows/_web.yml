@@ -70,7 +70,8 @@ jobs:
             echo "Error: FRONTEND_IMAGE is not set in .env (SECRET)"
             exit 1
           fi
-          echo "FRONTEND_IMAGE=${FRONTEND_IMAGE}" >> $GITHUB_ENV
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "FRONTEND_IMAGE=${FRONTEND_IMAGE}:${SHORT_SHA}" >> $GITHUB_ENV
 
       - uses: docker/setup-buildx-action@v3
 
