@@ -47,7 +47,7 @@ jobs:
 
       - name: Run API tests
         working-directory: apps/api
-        run: ./gradlew test --no-daemon
+        run: ./gradlew test --no-daemon --rerun-tasks
 
   docker-build:
     needs: test

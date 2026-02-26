@@ -96,4 +96,17 @@ bootRun {
 
 tasks.named('test') {
     useJUnitPlatform()
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = false
+    }
+    
+    afterSuite { desc, result ->
+        if (!desc.parent) {
+            println "\nTest Results: ${result.resultType}"
+            println "Tests: ${result.testCount}, Passed: ${result.successfulTestCount}, Failed: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}"
+        }
+    }
 }
