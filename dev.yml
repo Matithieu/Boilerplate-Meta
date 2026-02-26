@@ -1,0 +1,55 @@
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+
+  keycloak-db:
+    ports:
+      - "5433:5433"
+
+  keycloak:
+    ports:
+      - "8080:8080"
+    environment:
+      KC_HOSTNAME_DEBUG: "true"
+    command: ["start-dev", "--import-realm"]
+
+  backend:
+    image: boilerplate-meta-api
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  oauth2-proxy:
+    ports:
+      - "4180:4180"
+    environment:
+      OAUTH2_PROXY_SAME_SITE: "none"
+      OAUTH2_SKIP_JWT_BEARER_TOKENS: "true"
+      OAUTH2_PROXY_SHOW_DEBUG_ON_ERROR: "true"
+    command:
+      - --whitelist-domain=localhost:5173
+
+  prometheus:
+    ports:
+      - "9090:9090"
+
+  grafana:
+    ports:
+      - "3000:3000"
+
+  traefik:
+    volumes:
+      - ./config/traefik/dev:/etc/traefik
+      - ./config/traefik/dev/:/acme.json
+      - ./config/certs:/certs
+
+  frontend:
+    profiles:
+      - prod

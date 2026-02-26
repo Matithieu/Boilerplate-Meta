@@ -11,6 +11,16 @@ NC='\033[0m' # No Color
 # shellcheck disable=SC1091
 source .env
 
+# Sets COMPOSE_ARGS array with the right -f flags for the given environment
+# Dev merges docker-compose.yml with dev.yml; prod uses docker-compose.yml alone
+compose_args_for() {
+    if [ "$1" = "dev" ]; then
+        COMPOSE_ARGS=(-f docker-compose.yml -f dev.yml)
+    else
+        COMPOSE_ARGS=(-f docker-compose.yml)
+    fi
+}
+
 # Function to display help
 help() {
     echo -e "${GREEN}Usage:${NC} $0 COMMAND [ARGS]"
@@ -117,7 +127,8 @@ start() {
             BUILD_ARG="--build"
         fi
 
-        if docker compose -f "docker-compose-$1.yml" up -d ${BUILD_ARG} --quiet-pull; then
+        compose_args_for "$1"
+        if docker compose "${COMPOSE_ARGS[@]}" up -d ${BUILD_ARG} --quiet-pull; then
             echo -e "${GREEN}Containers are up!${NC}"
         else
             echo -e "${RED}Failed to start docker containers.${NC}"
@@ -150,11 +161,11 @@ stop() {
         fi
     fi
 
-    compose_file="docker-compose-$ENVIRONMENT.yml"
+    compose_args_for "$ENVIRONMENT"
 
     # Stop the Docker containers
     echo "Stopping Docker containers for the '$ENVIRONMENT' environment..."
-    if docker compose -f "$compose_file" down; then
+    if docker compose "${COMPOSE_ARGS[@]}" down; then
         echo -e "${GREEN}Containers for '$ENVIRONMENT' environment are stopped successfully!${NC}"
     else
         echo -e "${RED}Error: Failed to stop Docker containers for '$ENVIRONMENT'.${NC}"
@@ -315,8 +326,10 @@ reload() {
     ENV=$1
     SERVICE=$2
 
+    compose_args_for "$ENV"
+
     echo "Building the Docker image for $SERVICE..."
-    if docker compose -f "docker-compose-$ENV.yml" build "$SERVICE"; then
+    if docker compose "${COMPOSE_ARGS[@]}" build "$SERVICE"; then
         echo -e "${GREEN}Docker image built successfully.${NC}"
     else
         echo -e "${RED}Failed to build Docker image.${NC}"
@@ -324,7 +337,7 @@ reload() {
     fi
 
     echo "Starting a new instance of $SERVICE container with the updated image..."
-    if docker compose -f "docker-compose-$ENV.yml" up -d --scale "$SERVICE"=2 --no-recreate; then
+    if docker compose "${COMPOSE_ARGS[@]}" up -d --scale "$SERVICE"=2 --no-recreate; then
         echo -e "${GREEN}New instance of $SERVICE started successfully!${NC}"
     else
         echo -e "${RED}Failed to start a new instance of $SERVICE.${NC}"
@@ -339,7 +352,7 @@ reload() {
     fi
 
     echo "Stopping the old $SERVICE container..."
-    if docker compose -f "docker-compose-$ENV.yml" up -d --scale "$SERVICE"=1; then
+    if docker compose "${COMPOSE_ARGS[@]}" up -d --scale "$SERVICE"=1; then
         echo -e "${GREEN}Old instance of $SERVICE stopped successfully.${NC}"
     else
         echo -e "${RED}Failed to stop the old instance of $SERVICE.${NC}"
@@ -390,11 +403,12 @@ run_end2end_tests() {
 }
 
 
-run_docker_logs() {    
+run_docker_logs() {
     mkdir -p logs
+    compose_args_for "$1"
     services=("postgres" "pgadmin4" "keycloak-db" "keycloak" "backend" "redis" "oauth2-proxy" "prometheus" "grafana" "traefik" "frontend")
     for service in "${services[@]}"; do
-        if docker compose -f "docker-compose-$1.yml" logs "$service" &> "logs/${service}_$1.log"; then
+        if docker compose "${COMPOSE_ARGS[@]}" logs "$service" &> "logs/${service}_$1.log"; then
             echo -e "${GREEN}Logs for $service in $1 environment saved to logs/${service}_$1.log${NC}"
         else
             echo -e "${RED}Failed to retrieve logs for $service in $1 environment.${NC}"

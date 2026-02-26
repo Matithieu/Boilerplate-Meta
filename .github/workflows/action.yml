@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       MANUAL_TAG:
-        description: 'Optional manual tag to override versioning (e.g. 2.0.0)'
+        description: "Optional manual tag to override versioning (e.g. 2.0.0)"
         required: false
-        default: ''
+        default: ""
   push:
     branches:
       - develop
@@ -150,7 +150,10 @@ jobs:
   create-git-tag:
     needs: [compute-version, push-images]
     runs-on: ubuntu-22.04
-    if: github.event_name != 'pull_request' && needs.push-images.result == 'success'
+    if: |
+      always() &&
+      github.event_name != 'pull_request' &&
+      needs.push-images.result == 'success'
     permissions:
       contents: write
     steps:
@@ -164,3 +167,5 @@ jobs:
           git config user.email "actions@github.com"
           git tag -a "${{ needs.compute-version.outputs.image-tag }}" -m "Release ${{ needs.compute-version.outputs.image-tag }}"
           git push origin "${{ needs.compute-version.outputs.image-tag }}"
+
+# trigger workflow
