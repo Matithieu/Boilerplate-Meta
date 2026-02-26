@@ -11,6 +11,13 @@ export const useAppNavigate = () => {
   // Generic navigation helper
   const navigateTo = (path: string, state?: NavigateOptions) => {
     navigate(path, state ? { state } : undefined)
+    const currentLocation =
+      window.location.pathname + window.location.search + window.location.hash
+
+    if (currentLocation === path) {
+      // If navigating to the same path, do nothing
+      return
+    }
 
     /**
      * When navigating to /ui#hash, scroll to the element with the id of hash
