@@ -3,15 +3,15 @@ FROM eclipse-temurin:24-jdk AS build
 WORKDIR /home/gradle/src
 
 # Copy dependency configuration files first for better caching
-COPY build.gradle settings.gradle gradlew ./
-COPY gradle gradle/
+COPY apps/api/build.gradle apps/api/settings.gradle apps/api/gradlew ./
+COPY apps/api/gradle gradle/
 
 # Download dependencies (cached layer)
 RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew dependencies --no-daemon || true
 
 # Copy source code
-COPY src src/
+COPY apps/api/src src/
 
 # Build the application
 RUN --mount=type=cache,target=/root/.gradle \
