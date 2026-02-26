@@ -150,7 +150,10 @@ jobs:
   create-git-tag:
     needs: [compute-version, push-images]
     runs-on: ubuntu-22.04
-    if: github.event_name != 'pull_request' && needs.push-images.result == 'success'
+    if: |
+      always() &&
+      github.event_name != 'pull_request' &&
+      needs.push-images.result == 'success'
     permissions:
       contents: write
     steps:
