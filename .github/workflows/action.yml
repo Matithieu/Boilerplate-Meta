@@ -1,6 +1,12 @@
 name: Build Boilerplate-Meta
 
 on:
+  workflow_dispatch:
+    inputs:
+      MANUAL_TAG:
+        description: 'Optional manual tag to override versioning (e.g. 2.0.0)'
+        required: false
+        default: ''
   push:
     branches:
       - develop
@@ -52,16 +58,57 @@ jobs:
           echo "Web changed: ${{ steps.changes.outputs.web_any_changed }}"
           echo "E2E changed: ${{ steps.changes.outputs.e2e_any_changed }}"
 
+  compute-version:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    outputs:
+      image-tag: ${{ steps.version.outputs.IMAGE_TAG }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute version
+        id: version
+        run: |
+          git fetch --tags --force
+          LAST_TAG=$(git tag --sort=-creatordate | head -n 1)
+          if [ -z "$LAST_TAG" ]; then
+            LAST_TAG="0.0.0"
+          fi
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$LAST_TAG"
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            PATCH=$((PATCH + 1))
+          else
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          fi
+
+          IMAGE_TAG="${MAJOR}.${MINOR}.${PATCH}"
+
+          if [[ "${{ github.event.inputs.MANUAL_TAG }}" != "" ]]; then
+            IMAGE_TAG="${{ github.event.inputs.MANUAL_TAG }}"
+          fi
+
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "Computed version: ${IMAGE_TAG}"
+
   api:
-    needs: detect-changes
+    needs: [detect-changes, compute-version]
     if: needs.detect-changes.outputs.api == 'true'
     uses: ./.github/workflows/_api.yml
+    with:
+      image-tag: ${{ needs.compute-version.outputs.image-tag }}
     secrets: inherit
 
   web:
-    needs: detect-changes
+    needs: [detect-changes, compute-version]
     if: needs.detect-changes.outputs.web == 'true'
     uses: ./.github/workflows/_web.yml
+    with:
+      image-tag: ${{ needs.compute-version.outputs.image-tag }}
     secrets: inherit
 
   e2e-lint:
@@ -70,7 +117,7 @@ jobs:
     uses: ./.github/workflows/_e2e-lint.yml
 
   e2e-tests:
-    needs: [detect-changes, api, web]
+    needs: [detect-changes, compute-version, api, web]
     if: |
       always() &&
       (needs.detect-changes.outputs.api == 'true' || needs.detect-changes.outputs.web == 'true') &&
@@ -80,10 +127,11 @@ jobs:
     with:
       api-changed: ${{ needs.detect-changes.outputs.api }}
       web-changed: ${{ needs.detect-changes.outputs.web }}
+      image-tag: ${{ needs.compute-version.outputs.image-tag }}
     secrets: inherit
 
   push-images:
-    needs: [detect-changes, e2e-tests]
+    needs: [detect-changes, compute-version, e2e-tests]
     permissions:
       contents: read
       packages: write
@@ -95,4 +143,23 @@ jobs:
     with:
       api-changed: ${{ needs.detect-changes.outputs.api }}
       web-changed: ${{ needs.detect-changes.outputs.web }}
+      image-tag: ${{ needs.compute-version.outputs.image-tag }}
     secrets: inherit
+
+  create-git-tag:
+    needs: [compute-version, push-images]
+    runs-on: ubuntu-22.04
+    if: github.event_name != 'pull_request' && needs.push-images.result == 'success'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create and push Git tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a "${{ needs.compute-version.outputs.image-tag }}" -m "Release ${{ needs.compute-version.outputs.image-tag }}"
+          git push origin "${{ needs.compute-version.outputs.image-tag }}"

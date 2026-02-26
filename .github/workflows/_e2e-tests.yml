@@ -9,6 +9,9 @@ on:
       web-changed:
         type: string
         required: true
+      image-tag:
+        type: string
+        required: true
 
 jobs:
   run:
@@ -47,10 +50,8 @@ jobs:
 
       - name: Set image names
         run: |
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          IMAGE_TAG="${{ github.run_number }}-${SHORT_SHA}"
-          echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:${IMAGE_TAG}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${IMAGE_TAG}" >> $GITHUB_ENV
+          echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:${{ inputs.image-tag }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${{ inputs.image-tag }}" >> $GITHUB_ENV
 
       - name: Start production environment
         run: ./devcli start prod
