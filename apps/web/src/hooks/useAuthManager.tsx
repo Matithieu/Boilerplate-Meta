@@ -12,6 +12,11 @@ export default function useAuthManager() {
   )
 
   return {
+    /**
+     * This method can be used to renew the OAuth2 cookie
+     * @example after a user subscribes, we want to make sure they have the correct roles in their cookie,
+     * so we redirect them to the signIn route which will renew the cookie with the correct roles
+     */
     signIn: () => {
       const signInUrl = new URL(configuration?.oauthSignInUrl)
       signInUrl.searchParams.set('rd', configuration?.oauthSignInRedirectUrl)

@@ -14,7 +14,11 @@ import { FC } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 
 import ToastProvider from '../Toast/ToastProvider'
-import { ProtectedRoutes, ProtectedSimpleRoutes } from './ProtectedRoutes'
+import { AuthenticateUser } from './components/AuthenticateUser'
+import {
+  ProtectedApplicationRoutes,
+  ProtectedSubscriptionRoutes,
+} from './components/ProtectedRoutes'
 
 const AppRouter: FC = () => {
   return (
@@ -22,27 +26,29 @@ const AppRouter: FC = () => {
       <BrowserRouter>
         <Routes>
           <Route element={<Navigate replace to="/ui" />} path="/" />
-          <Route path="/ui">
-            <Route index element={<LandingPage />} />
-            <Route element={<TermsAndConditions />} path="terms" />
-            <Route element={<PrivacyPolicy />} path="privacy" />
-            <Route element={<LegalInformation />} path="legal" />
+          <Route loader element={<AuthenticateUser />}>
+            <Route path="/ui">
+              <Route index element={<LandingPage />} />
+              <Route element={<TermsAndConditions />} path="terms" />
+              <Route element={<PrivacyPolicy />} path="privacy" />
+              <Route element={<LegalInformation />} path="legal" />
 
-            <Route element={<ProtectedSimpleRoutes />}>
-              <Route element={<OrderFailurePage />} path="failure" />
-              <Route element={<OrderSuccessPage />} path="completion" />
-            </Route>
-
-            <Route element={<ProtectedRoutes />}>
-              <Route element={<Layout />}>
-                <Route element={<Ai />} path="ai" />
-                <Route element={<SettingsPage />} path="settings" />
-                <Route element={<AccountPage />} path="account" />
-                <Route element={<DashboardPage />} path="dashboard" />
+              <Route element={<ProtectedSubscriptionRoutes />}>
+                <Route element={<OrderFailurePage />} path="failure" />
+                <Route element={<OrderSuccessPage />} path="completion" />
               </Route>
-            </Route>
 
-            <Route element={<Page404 />} path="*" />
+              <Route element={<ProtectedApplicationRoutes />}>
+                <Route element={<Layout />}>
+                  <Route element={<Ai />} path="ai" />
+                  <Route element={<SettingsPage />} path="settings" />
+                  <Route element={<AccountPage />} path="account" />
+                  <Route element={<DashboardPage />} path="dashboard" />
+                </Route>
+              </Route>
+
+              <Route element={<Page404 />} path="*" />
+            </Route>
           </Route>
         </Routes>
 
