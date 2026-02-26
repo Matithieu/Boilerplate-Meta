@@ -148,12 +148,12 @@ jobs:
     secrets: inherit
 
   create-git-tag:
-    needs: [compute-version, api, web]
+    needs: [compute-version, api, web, push-images]
     runs-on: ubuntu-22.04
     if: |
       always() &&
       github.event_name != 'pull_request' &&
-      (needs.api.result == 'success' || needs.web.result == 'success')
+      needs.push-images.result == 'success'
     permissions:
       contents: write
     steps:
