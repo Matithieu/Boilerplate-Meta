@@ -120,6 +120,7 @@ jobs:
     needs: [detect-changes, compute-version, api, web]
     if: |
       always() &&
+      github.event_name != 'push' &&
       (needs.detect-changes.outputs.api == 'true' || needs.detect-changes.outputs.web == 'true') &&
       (needs.api.result == 'success' || needs.api.result == 'skipped') &&
       (needs.web.result == 'success' || needs.web.result == 'skipped')
