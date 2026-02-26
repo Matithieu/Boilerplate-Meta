@@ -7,7 +7,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "format": "turbo run format",
-    "api:build": "cd apps/api && ./gradlew clean build --no-daemon -x test",
+    "api:build": "cd apps/api && ./gradlew clean build --no-daemon -x test --quiet",
     "api:dev": "cd apps/api && ./gradlew bootRun"
   },
   "devDependencies": {

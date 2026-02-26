@@ -15,7 +15,7 @@ COPY src src/
 
 # Build the application
 RUN --mount=type=cache,target=/root/.gradle \
-    ./gradlew clean build --no-daemon
+    ./gradlew clean build --no-daemon --quiet
 
 # Runtime Stage (JRE only)
 FROM eclipse-temurin:24-jre
