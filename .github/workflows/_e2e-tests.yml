@@ -50,8 +50,16 @@ jobs:
 
       - name: Set image names
         run: |
-          echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:${{ inputs.image-tag }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${{ inputs.image-tag }}" >> $GITHUB_ENV
+          if [ "${{ inputs.api-changed }}" == "true" ]; then
+            echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:${{ inputs.image-tag }}" >> $GITHUB_ENV
+          else
+            echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:latest" >> $GITHUB_ENV
+          fi
+          if [ "${{ inputs.web-changed }}" == "true" ]; then
+            echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${{ inputs.image-tag }}" >> $GITHUB_ENV
+          else
+            echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:latest" >> $GITHUB_ENV
+          fi
 
       - name: Start production environment
         run: ./devcli start prod

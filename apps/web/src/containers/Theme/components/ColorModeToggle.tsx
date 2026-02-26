@@ -17,8 +17,8 @@ const ColorModeToggle: FC = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button>{isDark ? <Moon /> : <Sun />}</Button>
+      <DropdownMenuTrigger render={<Button />}>
+        {isDark ? <Moon /> : <Sun />}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme('light')}>

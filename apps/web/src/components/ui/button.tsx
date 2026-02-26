@@ -1,6 +1,6 @@
 import { makeStyles } from '@/theme/makeStyles'
 import { Button as BaseUiButton } from '@base-ui/react/button'
-import { FC } from 'react'
+import { forwardRef } from 'react'
 
 const useStyles = makeStyles()((theme) => ({
   root: {
@@ -40,15 +40,19 @@ const useStyles = makeStyles()((theme) => ({
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof BaseUiButton>
 
-const Button: FC<ButtonProps> = ({ className, ...props }) => {
-  const { cx, classes } = useStyles()
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, ...props }, ref) => {
+    const { cx, classes } = useStyles()
 
-  const mergedClassName: ButtonProps['className'] =
-    typeof className === 'function'
-      ? (state) => cx(classes.root, className(state))
-      : cx(classes.root, className)
+    const mergedClassName: ButtonProps['className'] =
+      typeof className === 'function'
+        ? (state) => cx(classes.root, className(state))
+        : cx(classes.root, className)
 
-  return <BaseUiButton className={mergedClassName} {...props} />
-}
+    return <BaseUiButton ref={ref} className={mergedClassName} {...props} />
+  },
+)
+
+Button.displayName = 'Button'
 
 export default Button

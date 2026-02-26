@@ -13,7 +13,7 @@
     "api:test:rerun": "cd apps/api && ./gradlew test --no-daemon  --quiet --rerun-tasks"
   },
   "devDependencies": {
-    "turbo": "^2.3.0"
+    "turbo": "^2.8.11"
   },
   "engines": {
     "node": ">=20",
