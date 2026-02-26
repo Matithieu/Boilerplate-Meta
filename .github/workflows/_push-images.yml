@@ -9,6 +9,9 @@ on:
       web-changed:
         type: string
         required: true
+      image-tag:
+        type: string
+        required: true
 
 jobs:
   push:
@@ -25,9 +28,8 @@ jobs:
 
       - name: Set image names
         run: |
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:${SHORT_SHA}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${SHORT_SHA}" >> $GITHUB_ENV
+          echo "API_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/api:${{ inputs.image-tag }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${{ inputs.image-tag }}" >> $GITHUB_ENV
 
       - name: Log in to Nexus Docker registry
         run: echo "${NEXUS_PASSWORD}" | docker login "${NEXUS_DOCKER_URL}" -u "${NEXUS_USERNAME}" --password-stdin

@@ -2,6 +2,10 @@ name: Web Pipeline
 
 on:
   workflow_call:
+    inputs:
+      image-tag:
+        type: string
+        required: true
 
 jobs:
   build:
@@ -61,9 +65,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set image name
-        run: |
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${SHORT_SHA}" >> $GITHUB_ENV
+        run: echo "FRONTEND_IMAGE=${{ secrets.NEXUS_DOCKER_URL }}/frontend:${{ inputs.image-tag }}" >> $GITHUB_ENV
 
       - uses: docker/setup-buildx-action@v3
 
