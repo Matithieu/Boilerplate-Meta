@@ -5,7 +5,7 @@ import { Outlet } from 'react-router'
 import Header from './components/LayoutHeader'
 import LayoutSidebar from './components/LayoutSideBar'
 
-const useStyles = makeStyles()((_) => ({
+const useStyles = makeStyles()((t) => ({
   root: {
     display: 'flex',
     height: '100svh',
@@ -20,6 +20,9 @@ const useStyles = makeStyles()((_) => ({
     overflowY: 'auto',
     overflowX: 'hidden',
     fontFamily: "'Poppins', sans-serif",
+    [t.bp.md]: {
+      marginLeft: '75px',
+    },
   },
 }))
 

@@ -15,16 +15,22 @@ type LayoutListItemProps = {
   navigation: () => void
 }
 
-const useStyles = makeStyles<{ isActive: boolean }>()(
+const useStyles = makeStyles<{ isActive: boolean; open: boolean }>()(
   (theme, { isActive }) => ({
     button: {
       display: 'flex',
       width: '100%',
       cursor: 'pointer',
       alignItems: 'center',
+      justifyContent: 'flex-start',
       gap: '0.5rem',
       borderRadius: theme.radius.md,
-      padding: '0.5rem',
+      paddingTop: '0.5rem',
+      paddingBottom: '0.5rem',
+      paddingRight: '0.5rem',
+      // Pin icon center at 37.5px (center of 75px collapsed width)
+      // 37.5px - outer-wrapper-padding(0.5rem) - half-icon-width(0.625rem)
+      paddingLeft: 'calc(37.5px - 1.125rem)',
       border: 'none',
       background: isActive ? theme.colors.primaryAlpha10 : 'none',
       color: isActive ? theme.colors.primary : theme.colors.mutedForeground,
@@ -57,18 +63,16 @@ const LayoutItem: FC<LayoutListItemProps> = ({
 }) => {
   const match = useMatch({ path, end: true })
   const isActive = !!match
-  const { classes } = useStyles({ isActive })
+  const { classes } = useStyles({ isActive, open })
 
   const buttonContent = (
     <>
       <span className={classes.iconSpan}>{icon}</span>
       <span
         style={{
-          flex: 1,
           whiteSpace: 'nowrap',
           fontSize: '0.875rem',
           fontWeight: 500,
-          overflow: 'hidden',
           opacity: open ? 1 : 0,
           maxWidth: open ? '200px' : '0',
           transition: 'opacity 0.3s ease, max-width 0.35s ease',

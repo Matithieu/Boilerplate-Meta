@@ -2,7 +2,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { useAppNavigate } from '@/hooks/useAppNavigate'
 import { makeStyles } from '@/theme/makeStyles'
 import { theme } from '@/theme/theme'
-import { Code2 } from 'lucide-react'
+import { Code2, PanelLeft, PanelLeftClose } from 'lucide-react'
 import { FC } from 'react'
 
 import LayoutListItems from './LayoutListItem/LayoutListItems'
@@ -14,13 +14,12 @@ const EXPANDED_WIDTH = theme.layout.sidebarWidth
 const TRANSITION =
   'width 400ms cubic-bezier(0.4, 0, 0.2, 1), transform 400ms cubic-bezier(0.4, 0, 0.2, 1)'
 
-// Only using makeStyles for the desktop media query override (can't do with inline styles)
+// Force sidebar always visible on desktop (overrides the mobile off-screen transform)
 const useStyles = makeStyles()((t) => ({
   sidebar: {
     backgroundColor: t.colors.card,
     borderRight: `1px solid ${t.colors.border}`,
     [t.bp.md]: {
-      position: 'sticky !important' as 'sticky',
       transform: 'translateX(0) !important',
     },
   },
@@ -29,38 +28,15 @@ const useStyles = makeStyles()((t) => ({
 const LayoutSidebar: FC = () => {
   const { classes } = useStyles()
   const { navigation } = useAppNavigate()
-  const {
-    isOpen,
-    isManuallyOpened,
-    sidebarRef,
-    handleMouseEnter,
-    handleMouseLeave,
-    handleClose,
-    handleKeyDown,
-  } = useSidebarState({ hoverDelay: 600, hoverLeaveDelay: 100 })
+  const { isOpen, sidebarRef, handleToggle, handleKeyDown } = useSidebarState()
 
   const sidebarWidth = isOpen ? EXPANDED_WIDTH : COLLAPSED_WIDTH
-  const sidebarTransform = isManuallyOpened
+  const sidebarTransform = isOpen
     ? 'translateX(0)'
     : 'translateX(calc(100% * (var(--SideNavigation-slideIn, 0) - 1)))'
 
   return (
     <>
-      {/* Backdrop overlay for mobile */}
-      {isManuallyOpened && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 999,
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-            transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-          onClick={handleClose}
-        />
-      )}
-
       {/* Main sidebar */}
       <aside
         ref={sidebarRef as React.RefObject<HTMLElement>}
@@ -82,12 +58,9 @@ const LayoutSidebar: FC = () => {
           transform: sidebarTransform,
           transition: TRANSITION,
           willChange: 'width, transform',
-          // On mobile, offset content below the fixed header
           paddingTop: '52px',
         }}
         onKeyDown={handleKeyDown}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
       >
         {/* Logo */}
         <div
@@ -95,7 +68,10 @@ const LayoutSidebar: FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
-            padding: '1rem 0.75rem 0.5rem',
+            paddingTop: '1rem',
+            paddingBottom: '0.5rem',
+            paddingRight: '0.75rem',
+            paddingLeft: 'calc(37.5px - 1.25rem)',
             overflow: 'hidden',
           }}
         >
@@ -115,7 +91,7 @@ const LayoutSidebar: FC = () => {
               color: theme.colors.primary,
             }}
             type="button"
-            onClick={() => navigation.toAi()}
+            onClick={() => navigation.toDashboard()}
           >
             <Code2
               aria-hidden="true"
@@ -137,6 +113,34 @@ const LayoutSidebar: FC = () => {
             Boilerplate
           </span>
         </div>
+
+        {/* Toggle button — pinned to top-right corner */}
+        <button
+          aria-label={isOpen ? 'Close sidebar' : 'Open sidebar'}
+          style={{
+            position: 'absolute',
+            top: '0.5rem',
+            left: 'calc(37.5px - 1rem)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '2rem',
+            height: '2rem',
+            borderRadius: theme.radius.md,
+            border: 'none',
+            cursor: 'pointer',
+            background: 'none',
+            color: theme.colors.mutedForeground,
+          }}
+          type="button"
+          onClick={handleToggle}
+        >
+          {isOpen ? (
+            <PanelLeftClose aria-hidden="true" size={16} />
+          ) : (
+            <PanelLeft aria-hidden="true" size={16} />
+          )}
+        </button>
 
         <TooltipProvider>
           <LayoutListItems open={isOpen} />

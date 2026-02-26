@@ -18,7 +18,12 @@ const useStyles = makeStyles()((theme) => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     gap: '0.25rem',
-    padding: '0.25rem 0 0.5rem',
+    paddingTop: '0.25rem',
+    paddingBottom: '0.5rem',
+    paddingRight: 0,
+    // Pin avatar center at 37.5px (center of 75px collapsed width)
+    // 37.5px - avatarWrapper-padding(0.5rem) - half-avatar-width(1.25rem)
+    paddingLeft: 'calc(37.5px - 1.75rem)',
   },
   accountButton: {
     display: 'flex',
