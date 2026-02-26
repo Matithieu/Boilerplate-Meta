@@ -1,11 +1,11 @@
 package com.example.spring;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
-@Disabled("Temp")
 @SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 class ApplicationTests {
 
     @Test

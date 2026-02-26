@@ -10,16 +10,25 @@ import static com.example.spring.common.utils.HeadersUtil.parseTokenFromHeader;
 
 public class JwtUtil {
     public static String[] splitToken(String token) {
+        if (token == null) {
+            throw new IllegalArgumentException("JWT token cannot be null");
+        }
         return token.split("\\.");
     }
 
     public static String decodePayload(String token) {
+        if (token == null) {
+            throw new IllegalArgumentException("JWT token cannot be null");
+        }
         String[] parts = splitToken(token);
         return new String(Base64.getDecoder().decode(parts[1]));
     }
 
     public static String extractUserIdFromHeader() {
         String token = parseTokenFromHeader();
+        if (token == null) {
+            throw new IllegalArgumentException("Authorization token is missing. Ensure requests go through oauth2-proxy or include X-Auth-Request-Access-Token header.");
+        }
         String payload = decodePayload(token);
 
         ObjectMapper objectMapper = new ObjectMapper();

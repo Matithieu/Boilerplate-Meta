@@ -1,6 +1,6 @@
 {
   "id": "41e56588-2764-4423-b65b-9cacc430fc94",
-  "realm": "infoCompanies",
+  "realm": "boilerplate",
   "displayName": "",
   "displayNameHtml": "",
   "notBefore": 0,
@@ -95,7 +95,7 @@
       },
       {
         "id": "58a19319-ab38-479d-b43c-62553d51a68e",
-        "name": "default-roles-infocompanies",
+        "name": "default-roles-boilerplate",
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
@@ -328,7 +328,7 @@
       ],
       "security-admin-console": [],
       "admin-cli": [],
-      "spring-api-infocompanies": [
+      "spring-api-boilerplate": [
         {
           "id": "125a1212-1c2d-4b58-9b70-0d6dcfd9192e",
           "name": "uma_protection",
@@ -439,7 +439,7 @@
   "groups": [],
   "defaultRole": {
     "id": "58a19319-ab38-479d-b43c-62553d51a68e",
-    "name": "default-roles-infocompanies",
+    "name": "default-roles-boilerplate",
     "description": "${role_default-roles}",
     "composite": true,
     "clientRole": false,
@@ -502,12 +502,12 @@
       "clientId": "account",
       "name": "${client_account}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/infoCompanies/account/",
+      "baseUrl": "/realms/boilerplate/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["/realms/infoCompanies/account/*"],
+      "redirectUris": ["/realms/boilerplate/account/*"],
       "webOrigins": [],
       "notBefore": 0,
       "bearerOnly": false,
@@ -533,12 +533,12 @@
       "clientId": "account-console",
       "name": "${client_account-console}",
       "rootUrl": "${authBaseUrl}",
-      "baseUrl": "/realms/infoCompanies/account/",
+      "baseUrl": "/realms/boilerplate/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["/realms/infoCompanies/account/*"],
+      "redirectUris": ["/realms/boilerplate/account/*"],
       "webOrigins": [],
       "notBefore": 0,
       "bearerOnly": false,
@@ -671,12 +671,12 @@
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
       "rootUrl": "${authAdminUrl}",
-      "baseUrl": "/admin/infoCompanies/console/",
+      "baseUrl": "/admin/boilerplate/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["/admin/infoCompanies/console/*"],
+      "redirectUris": ["/admin/boilerplate/console/*"],
       "webOrigins": ["+"],
       "notBefore": 0,
       "bearerOnly": false,
@@ -718,8 +718,8 @@
     },
     {
       "id": "d3555771-126e-45f0-9d16-4746d5ae66b0",
-      "clientId": "spring-api-infocompanies",
-      "name": "Spring Backend InfoCompanies",
+      "clientId": "spring-api-boilerplate",
+      "name": "Spring Backend Boilerplate",
       "description": "",
       "rootUrl": "",
       "adminUrl": "",
@@ -842,7 +842,7 @@
           "protocolMapper": "oidc-audience-mapper",
           "consentRequired": false,
           "config": {
-            "included.client.audience": "spring-api-infocompanies",
+            "included.client.audience": "spring-api-boilerplate",
             "id.token.claim": "true",
             "lightweight.claim": "false",
             "introspection.token.claim": "true",
@@ -2409,7 +2409,7 @@
           "value": "${KEYCLOAK_ADMIN_CLI_PASSWORD}"
         }
       ],
-      "realmRoles": ["default-roles-infocompanies", "verified", "admin"],
+      "realmRoles": ["default-roles-boilerplate", "verified", "admin"],
       "clientRoles": {
         "realm-management": ["realm-admin"]
       },
@@ -2433,7 +2433,7 @@
           "value": "${KEYCLOAK_USER_TEST_PASSWORD}"
         }
       ],
-      "realmRoles": ["default-roles-infocompanies", "verified"],
+      "realmRoles": ["default-roles-boilerplate", "verified"],
       "attributes": {
         "isVerified": "true",
         "tier": "ENTERPRISE",
