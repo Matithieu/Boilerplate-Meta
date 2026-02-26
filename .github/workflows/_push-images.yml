@@ -51,9 +51,13 @@ jobs:
         run: |
           docker load < api-image.tar.gz
           docker push ${API_IMAGE}
+          docker tag ${API_IMAGE} ${{ secrets.NEXUS_DOCKER_URL }}/api:latest
+          docker push ${{ secrets.NEXUS_DOCKER_URL }}/api:latest
 
       - name: Load and push Web image
         if: inputs.web-changed == 'true'
         run: |
           docker load < web-image.tar.gz
           docker push ${FRONTEND_IMAGE}
+          docker tag ${FRONTEND_IMAGE} ${{ secrets.NEXUS_DOCKER_URL }}/frontend:latest
+          docker push ${{ secrets.NEXUS_DOCKER_URL }}/frontend:latest
