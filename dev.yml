@@ -34,7 +34,19 @@ services:
       OAUTH2_SKIP_JWT_BEARER_TOKENS: "true"
       OAUTH2_PROXY_SHOW_DEBUG_ON_ERROR: "true"
     command:
+      - --whitelist-domain=${HOSTNAME}
+      - --whitelist-domain=${HOSTNAME_PORT}
+      - --whitelist-domain=localhost
       - --whitelist-domain=localhost:5173
+      - --whitelist-domain=localhost:443
+      - --insecure-oidc-allow-unverified-email=true
+      - --prefer-email-to-user=true
+      - --set-xauthrequest=true
+      - --skip-provider-button=true
+      - --insecure-oidc-skip-issuer-verification=true
+      - --skip-auth-route=/api/v1/stripe/webhook
+      - --skip-auth-route=GET=/api/v1/configuration
+      - --skip-auth-route=GET=/api/actuator/health
 
   prometheus:
     ports:

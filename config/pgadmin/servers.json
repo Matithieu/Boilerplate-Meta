@@ -9,7 +9,7 @@
       "Username": "postgres",
       "SSLMode": "prefer",
       "Timeout": 10,
-      "Comment": "Local InfoCompanies database"
+      "Comment": "Local App database"
     }
   }
 }

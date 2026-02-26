@@ -20,7 +20,7 @@ export default defineConfig({
       '/api': {
         target: process.env.API_BACKEND_URL || 'https://localhost:443',
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        changeOrigin: true,
       },
     },
   },

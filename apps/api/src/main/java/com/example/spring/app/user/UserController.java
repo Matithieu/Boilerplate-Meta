@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public Response updateUser(@RequestParam UserDTO user) {
+    public Response updateUser(@ModelAttribute UserDTO user) {
         String id = extractUserIdFromHeader();
         UserDTO existingUser = userResource.getUserById(id);
 

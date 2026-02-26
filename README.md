@@ -1,4 +1,4 @@
-# InfoCompanies Project
+# Boilerplate-Meta Project
 
 This project is a collection of services and tools to manage company information. It includes several sub-projects, each with a specific role.
 
@@ -7,7 +7,7 @@ This project is a collection of services and tools to manage company information
 1. Clone the repository:
 
    ```sh
-    git clone https://github.com/Matithieu/InfoCompanies-Meta.git
+    git clone https://github.com/Matithieu/Boilerplate-Meta.git
    ```
 
    Clone the other repos:

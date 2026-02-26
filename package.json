@@ -8,7 +8,9 @@
     "test": "turbo run test",
     "format": "turbo run format",
     "api:build": "cd apps/api && ./gradlew clean build --no-daemon -x test --quiet",
-    "api:dev": "cd apps/api && ./gradlew bootRun"
+    "api:dev": "cd apps/api && ./gradlew bootRun",
+    "api:test": "cd apps/api && ./gradlew test --no-daemon --quiet",
+    "api:test:rerun": "cd apps/api && ./gradlew test --no-daemon  --quiet --rerun-tasks"
   },
   "devDependencies": {
     "turbo": "^2.3.0"
