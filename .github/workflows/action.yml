@@ -73,7 +73,7 @@ jobs:
         id: version
         run: |
           git fetch --tags --force
-          LAST_TAG=$(git tag --sort=-creatordate | head -n 1)
+          LAST_TAG=$(git tag --sort=-version:refname | head -n 1)
           if [ -z "$LAST_TAG" ]; then
             LAST_TAG="0.0.0"
           fi
@@ -148,12 +148,12 @@ jobs:
     secrets: inherit
 
   create-git-tag:
-    needs: [compute-version, push-images]
+    needs: [compute-version, api, web]
     runs-on: ubuntu-22.04
     if: |
       always() &&
       github.event_name != 'pull_request' &&
-      needs.push-images.result == 'success'
+      (needs.api.result == 'success' || needs.web.result == 'success')
     permissions:
       contents: write
     steps:
