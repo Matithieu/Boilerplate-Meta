@@ -80,13 +80,12 @@ jobs:
           IFS='.' read -r MAJOR MINOR PATCH <<< "$LAST_TAG"
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            PATCH=$((PATCH + 1))
+            SHORT_SHA=$(git rev-parse --short "${{ github.event.pull_request.head.sha }}")
+            IMAGE_TAG="${MAJOR}.${MINOR}.$((PATCH + 1))-${SHORT_SHA}"
           else
             MINOR=$((MINOR + 1))
-            PATCH=0
+            IMAGE_TAG="${MAJOR}.${MINOR}.0"
           fi
-
-          IMAGE_TAG="${MAJOR}.${MINOR}.${PATCH}"
 
           if [[ "${{ github.event.inputs.MANUAL_TAG }}" != "" ]]; then
             IMAGE_TAG="${{ github.event.inputs.MANUAL_TAG }}"
